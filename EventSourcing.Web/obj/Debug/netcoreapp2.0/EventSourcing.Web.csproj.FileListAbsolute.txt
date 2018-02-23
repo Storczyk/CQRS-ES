@@ -1,0 +1,11 @@
+C:\Users\psroczyk\source\repos\EventSourcingPoc\EventSourcing.Web\bin\Debug\netcoreapp2.0\EventSourcing.Web.deps.json
+C:\Users\psroczyk\source\repos\EventSourcingPoc\EventSourcing.Web\bin\Debug\netcoreapp2.0\EventSourcing.Web.runtimeconfig.json
+C:\Users\psroczyk\source\repos\EventSourcingPoc\EventSourcing.Web\bin\Debug\netcoreapp2.0\EventSourcing.Web.runtimeconfig.dev.json
+C:\Users\psroczyk\source\repos\EventSourcingPoc\EventSourcing.Web\bin\Debug\netcoreapp2.0\EventSourcing.Web.dll
+C:\Users\psroczyk\source\repos\EventSourcingPoc\EventSourcing.Web\obj\Debug\netcoreapp2.0\EventSourcing.Web.csprojResolveAssemblyReference.cache
+C:\Users\psroczyk\source\repos\EventSourcingPoc\EventSourcing.Web\obj\Debug\netcoreapp2.0\EventSourcing.Web.csproj.CoreCompileInputs.cache
+C:\Users\psroczyk\source\repos\EventSourcingPoc\EventSourcing.Web\obj\Debug\netcoreapp2.0\EventSourcing.Web.AssemblyInfoInputs.cache
+C:\Users\psroczyk\source\repos\EventSourcingPoc\EventSourcing.Web\obj\Debug\netcoreapp2.0\EventSourcing.Web.AssemblyInfo.cs
+C:\Users\psroczyk\source\repos\EventSourcingPoc\EventSourcing.Web\bin\Debug\netcoreapp2.0\EventSourcing.Web.pdb
+C:\Users\psroczyk\source\repos\EventSourcingPoc\EventSourcing.Web\obj\Debug\netcoreapp2.0\EventSourcing.Web.dll
+C:\Users\psroczyk\source\repos\EventSourcingPoc\EventSourcing.Web\obj\Debug\netcoreapp2.0\EventSourcing.Web.pdb

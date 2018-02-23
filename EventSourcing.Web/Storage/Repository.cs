@@ -1,0 +1,46 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using EventSourcing.Web.Clients.Storage;
+using EventSourcing.Web.Domain.Events;
+
+namespace EventSourcing.Web.Storage
+{
+    public class Repository : IRepository
+    {
+        private readonly IEventStore _eventStore;
+
+        public Repository(IEventStore eventStore)
+        {
+            _eventStore = eventStore;
+        }
+
+        public async Task<List<IEvent>> Save<T>(T aggregate, int? expectedVersion = null,
+            CancellationToken cancellationToken = default(CancellationToken)) where T : AggregateRoot
+        {
+            if (expectedVersion != null &&
+                (await _eventStore.Get(aggregate.Id, expectedVersion.Value, cancellationToken)).Any())
+            {
+                //different versio found
+            }
+
+            var changes = aggregate.FlushUncommitedChanges();
+            return await _eventStore.Save(changes, cancellationToken);
+        }
+
+        public async Task<T> Get<T>(Guid aggregateId, CancellationToken cancellationToken = default(CancellationToken)) where T : AggregateRoot
+        {
+            var events = await _eventStore.Get(aggregateId, -1, cancellationToken);
+            if (!events.Any())
+            {
+                //not found
+            }
+
+            var aggregate = (T)Activator.CreateInstance(typeof(T));
+            aggregate.LoadFromHistory(events);
+            return aggregate;
+        }
+    }
+}
