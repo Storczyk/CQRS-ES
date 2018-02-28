@@ -62,13 +62,5 @@ namespace EventSourcing.Web.Controllers
         {
             await _commandBus.Send(new UpdateClient(id, clientInfo));
         }
-
-        // POST api/values
-
-        [HttpDelete("{id}")]
-        public async Task Post(Guid id)
-        {
-            await _commandBus.Send(new DeleteClient(id));
-        }
     }
 }

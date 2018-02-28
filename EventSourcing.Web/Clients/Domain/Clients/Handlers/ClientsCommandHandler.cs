@@ -13,8 +13,7 @@ namespace EventSourcing.Web.Clients.Domain.Clients.Handlers
 {
     public class ClientsCommandHandler :
                     ICommandHandler<CreateClient>,
-                    ICommandHandler<UpdateClient>,
-                    ICommandHandler<DeleteClient>
+                    ICommandHandler<UpdateClient>
     {
         private readonly ISession _session;
         private readonly IEventBus _eventBus;
@@ -39,17 +38,15 @@ namespace EventSourcing.Web.Clients.Domain.Clients.Handlers
 
         public async Task Handle(UpdateClient command, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var client = ClientsDbContext.Clients.FirstOrDefault(x => x.Id == command.Id);
-            ClientsDbContext.Clients.Remove(client);
+            var client = await _session.Get<Client>(command.Id, cancellationToken: cancellationToken);
             client.Update(command.Data);
-            ClientsDbContext.Clients.Add(client);
-        }
+            await _session.Add(client, cancellationToken);
+            var eventList = await _session.Commit(cancellationToken);
 
-        public async Task Handle(DeleteClient command, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            var client = ClientsDbContext.Clients.FirstOrDefault(x => x.Id == command.Id);
-
-            ClientsDbContext.Clients.Remove(client);
+            foreach (var @event in eventList)
+            {
+                await _eventBus.Publish(@event);
+            }
         }
     }
 }

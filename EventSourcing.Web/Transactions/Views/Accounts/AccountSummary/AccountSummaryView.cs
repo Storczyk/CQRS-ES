@@ -15,7 +15,6 @@ namespace EventSourcing.Web.Transactions.Views.Accounts.AccountSummary
         public string Number { get; set; }
         public decimal Balance { get; set; }
         public int TransactionsCount { get; set; }
-        public bool IsDeleted { get; set; }
 
         public void ApplyEvent(NewAccountCreatedEvent @event)
         {
@@ -39,11 +38,6 @@ namespace EventSourcing.Web.Transactions.Views.Accounts.AccountSummary
         internal void ApplyEvent(ClientUpdatedEvent @event)
         {
             ClientName = @event.Data.Name;
-        }
-
-        internal void ApplyEvent(ClientDeletedEvent @event)
-        {
-            IsDeleted = false;
         }
 
         public void ApplyEvent(NewOutTransactionRecorded @event)

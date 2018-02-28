@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace EventSourcing.Web
 {
@@ -37,7 +38,15 @@ namespace EventSourcing.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDistributedRedisCache(x =>
+            {
+                x.Configuration = "localhost:6379";
+            });
+            ConnectionMultiplexer multiplexer = ConnectionMultiplexer.Connect("localhost:6379");
+            services.AddSingleton<IConnectionMultiplexer>(multiplexer);
+            services.AddSession();
             services.AddMvc();
+
             services.AddTransient<IAccountNumberGenerator, RandomAccountNumberGenerator>();
 
             ConfigureMediator(services);
@@ -53,6 +62,7 @@ namespace EventSourcing.Web
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseSession();
             app.UseMvc();
         }
 
@@ -71,13 +81,12 @@ namespace EventSourcing.Web
 
             services.AddScoped<IRequestHandler<CreateClient>, ClientsCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateClient>, ClientsCommandHandler>();
-            services.AddScoped<IRequestHandler<DeleteClient>, ClientsCommandHandler>();
             services.AddScoped<IRequestHandler<GetClients, List<ClientListItem>>, ClientsQueryHandler>();
             services.AddScoped<IRequestHandler<GetClient, ClientItem>, ClientsQueryHandler>();
             services.AddScoped<ISession, Session>();
             services.AddSingleton<IEventStore, InMemoryEventStore>();
             services.AddScoped<IRepository, Repository>();
-        }       
+        }
 
         private static void ConfigureMediator(IServiceCollection services)
         {
