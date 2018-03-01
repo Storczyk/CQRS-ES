@@ -19,14 +19,10 @@ namespace EventSourcing.Web.Transactions.Domain.Clients.Handlers
 
         public Task Handle(ClientCreatedEvent @event, CancellationToken cancellationToken = default(CancellationToken))
         {
-            InMemoryDatabase.List.Add(new ClientListItem
-            {
-                Id = @event.ClientId,
-                Name = @event.Data.Name
-            });
             var client = new ClientItem(@event.ClientId, @event.Data.Name, @event.Data.Email);
             InMemoryDatabase.Details.TryAdd(@event.Id, client);
-            Save(@event.Id, client);
+            Save(@event.Id, @event);
+
             return Task.CompletedTask;
         }
 

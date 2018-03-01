@@ -10,7 +10,7 @@ namespace EventSourcing.Web
     {
         private readonly List<IEvent> _changes = new List<IEvent>();
 
-        public Guid Id { get; protected set; }
+        public Guid AggregateId { get; protected set; }
         public int Version { get; protected set; }
 
         public IEvent[] GetUncommittedChanges()
@@ -29,13 +29,13 @@ namespace EventSourcing.Web
                 var i = 0;
                 foreach (var @event in changes)
                 {
-                    if (@event.Id == Guid.Empty && Id == Guid.Empty)
+                    if (@event.Id == Guid.Empty && AggregateId == Guid.Empty)
                     {
                         throw new AggregateException($"{GetType()}, {@event.GetType()}");
                     }
                     if (@event.Id == Guid.Empty)
                     {
-                        @event.Id = Id;
+                        @event.Id = AggregateId;
                     }
                     i++;
                     @event.Version = Version + i;
@@ -58,7 +58,7 @@ namespace EventSourcing.Web
                         throw new AggregateException($"{e.Id}");
                     }
                     ApplyEvent(e);
-                    Id = e.Id;
+                    AggregateId = e.Id;
                     Version++;
                 }
             }

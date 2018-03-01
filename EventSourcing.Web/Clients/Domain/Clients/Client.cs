@@ -15,13 +15,13 @@ namespace EventSourcing.Web.Clients.Domain.Clients
 
         public Client(Guid id, string name, string email)
         {
-            Id = id;
+            AggregateId = id;
             ApplyChange(new ClientCreatedEvent(id, new ClientInfo(name, email), Guid.NewGuid()));
         }
 
         public void Update(ClientInfo clientInfo)
         {
-            ApplyChange(new ClientUpdatedEvent(Id, clientInfo));
+            ApplyChange(new ClientUpdatedEvent(AggregateId, clientInfo));
         }
 
         public void AddAccount(Guid id)

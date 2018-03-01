@@ -37,26 +37,14 @@ namespace EventSourcing.Web.Clients.Storage
             return JsonConvert.DeserializeObject<T>(serializedObject.ToString());
         }
 
-        public ClientListItem[] GetAll<T>()
+        public List<T> GetAll<T>()
         {
             var database = _redisConnection.GetDatabase();
             var endpoint = _redisConnection.GetEndPoints().First();
-            var keys = _redisConnection.GetServer(endpoint).Keys();
-            var list = new List<ClientListItem>();
-            foreach (var redisKey in keys)
-            {
-                var jsonString = database.StringGet(redisKey).ToString().Replace("[", "").Replace("]","");
-                if (jsonString.ToLower().Contains("location"))
-                    continue;
-                var x = JsonConvert.DeserializeObject<ClientListItem>(jsonString);
-                if (!string.IsNullOrEmpty(x.Name))
-                {
-                    list.Add(x);
-                }
+            var keys = _redisConnection.GetServer(endpoint).Keys(pattern: _namespace+"*");
 
-            }
-
-            return list.ToArray();
+            return keys.Select(redisKey => database.StringGet(redisKey).ToString().Replace("[", "").Replace("]", ""))
+                .Select(JsonConvert.DeserializeObject<T>).Where(x => !string.IsNullOrEmpty(x.ToString())).ToList();
         }
 
         public List<T> GetMultiple<T>(List<Guid> ids)

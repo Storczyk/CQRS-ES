@@ -6,7 +6,7 @@ namespace EventSourcing.Web.ClientsContracts.Queries
 {
     public class ClientListItem
     {
-        public Guid Id { get; set; }
+        public Guid ClientId { get; set; }
         public string Name { get; set; }
     }
 

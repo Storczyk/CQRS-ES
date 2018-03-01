@@ -9,6 +9,5 @@ namespace EventSourcing.Web.Storage
     public static class InMemoryDatabase
     {
         public static readonly Dictionary<Guid, ClientItem> Details = new Dictionary<Guid, ClientItem>();
-        public static readonly List<ClientListItem> List = new List<ClientListItem>();
     }
 }

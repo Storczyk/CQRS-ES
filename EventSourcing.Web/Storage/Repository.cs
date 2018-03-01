@@ -21,7 +21,7 @@ namespace EventSourcing.Web.Storage
             CancellationToken cancellationToken = default(CancellationToken)) where T : AggregateRoot
         {
             if (expectedVersion != null &&
-                (await _eventStore.Get(aggregate.Id, expectedVersion.Value, cancellationToken)).Any())
+                (await _eventStore.Get(aggregate.AggregateId, expectedVersion.Value, cancellationToken)).Any())
             {
                 //different versio found
             }

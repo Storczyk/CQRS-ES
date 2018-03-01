@@ -20,11 +20,11 @@ namespace EventSourcing.Web.Storage
 
         public Task Add<T>(T aggregate, CancellationToken cancellationToken = default(CancellationToken)) where T : AggregateRoot
         {
-            if (!IsTracked(aggregate.Id))
+            if (!IsTracked(aggregate.AggregateId))
             {
-                _trackedAggregates.Add(aggregate.Id, new AggregateDescriptor { Aggregate = aggregate, Version = aggregate.Version });
+                _trackedAggregates.Add(aggregate.AggregateId, new AggregateDescriptor { Aggregate = aggregate, Version = aggregate.Version });
             }
-            else if (_trackedAggregates[aggregate.Id].Aggregate != aggregate)
+            else if (_trackedAggregates[aggregate.AggregateId].Aggregate != aggregate)
             {
                 //different aggregate
             }
