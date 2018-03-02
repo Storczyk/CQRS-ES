@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventSourcing.Web.Clients.Domain.Clients;
 using EventSourcing.Web.Clients.Storage;
+using EventSourcing.Web.ClientsContracts.Events;
 using EventSourcing.Web.ClientsContracts.Queries;
 using EventSourcing.Web.Domain.Queries;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
@@ -15,19 +16,32 @@ using InMemoryDatabase = EventSourcing.Web.Storage.InMemoryDatabase;
 namespace EventSourcing.Web.Clients.Views.Clients
 {
     public class ClientsQueryHandler : ClientsDbContext,
-                    IQueryHandler<GetClients, List<ClientListItem>>,
-                    IQueryHandler<GetClient, ClientItem>
+                    IQueryHandler<GetClients, List<Client>>,
+                    IQueryHandler<GetClient, Client>
     {
-        public ClientsQueryHandler(IConnectionMultiplexer redis) : base(redis, "Clients") { }
+        public ClientsQueryHandler(IConnectionMultiplexer redis) : base(redis) { }
 
-        public Task<List<ClientListItem>> Handle(GetClients query, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<List<Client>> Handle(GetClients query, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var client = GetAll<ClientListItem>();
+            //var client = GetAll<Client>();
+            var events = Load<ClientCreatedEvent>();
+            var list = new List<Client>();
+            foreach (var clientCreatedEvent in events)
+            {
+                Client client = new Client();
+                client.ApplyChange(clientCreatedEvent);
+                var clientEvents = GetEvents(client.AggregateId);
+                if (clientEvents.Any())
+                {
+                    client.LoadFromHistory(clientEvents);
+                }
 
-            return System.Threading.Tasks.Task.FromResult(client.ToList());
+                list.Add(client);
+            }
+            return System.Threading.Tasks.Task.FromResult(list);
         }
 
-        public Task<ClientItem> Handle(GetClient query, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<Client> Handle(GetClient query, CancellationToken cancellationToken = default(CancellationToken))
         {
 
             return Task.FromResult(InMemoryDatabase.Details.FirstOrDefault(x => x.Key == query.ClientId).Value);

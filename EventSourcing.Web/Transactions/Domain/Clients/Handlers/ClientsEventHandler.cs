@@ -15,12 +15,11 @@ namespace EventSourcing.Web.Transactions.Domain.Clients.Handlers
         INotificationHandler<ClientCreatedEvent>,
         INotificationHandler<ClientUpdatedEvent>
     {
-        public ClientDetailView(IConnectionMultiplexer connection) : base(connection, "Clients") { }
+        public ClientDetailView(IConnectionMultiplexer connection) : base(connection) { }
 
         public Task Handle(ClientCreatedEvent @event, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var client = new ClientItem(@event.ClientId, @event.Data.Name, @event.Data.Email);
-            InMemoryDatabase.Details.TryAdd(@event.Id, client);
+            //var client = new ClientItem(@event.ClientId, @event.Data.Name, @event.Data.Email);
             Save(@event.Id, @event);
 
             return Task.CompletedTask;
@@ -28,22 +27,13 @@ namespace EventSourcing.Web.Transactions.Domain.Clients.Handlers
 
         public Task Handle(ClientUpdatedEvent @event, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var item = GetDetailsItem(@event.Id);
-            item.Name = @event.Data.Name;
-            item.Email = @event.Data.Email;
-            InMemoryDatabase.Details.TryAdd(@event.Id, item);
+            //var item = GetDetailsItem(@event.Id);
+            //item.Name = @event.Data.Name;
+            //item.Email = @event.Data.Email;
+            //InMemoryDatabase.Details.TryAdd(@event.Id, item);
+
+            Save(@event.Id, @event);
             return Task.CompletedTask;
-        }
-
-        private static ClientItem GetDetailsItem(Guid id)
-        {
-            if (!InMemoryDatabase.Details.TryGetValue(id, out var item))
-            {
-                //not found
-            }
-
-            InMemoryDatabase.Details.Remove(id);
-            return item;
-        }
+        }        
     }
 }

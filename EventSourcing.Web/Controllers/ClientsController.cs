@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EventSourcing.Web.Clients.Domain.Clients;
 using EventSourcing.Web.ClientsContracts.Commands;
 using EventSourcing.Web.ClientsContracts.Events;
 using EventSourcing.Web.ClientsContracts.Queries;
@@ -31,16 +32,16 @@ namespace EventSourcing.Web.Controllers
 
 
         [HttpGet]
-        public Task<List<ClientListItem>> Get()
+        public Task<List<Client>> Get()
         {
-            return _queryBus.Send<GetClients, List<ClientListItem>>(new GetClients());
+            return _queryBus.Send<GetClients, List<Client>>(new GetClients());
         }
 
 
         [HttpGet("{id}")]
-        public Task<ClientItem> Get(Guid id)
+        public Task<Client> Get(Guid id)
         {
-            return _queryBus.Send<GetClient, ClientItem>(new GetClient(id));
+            return _queryBus.Send<GetClient, Client>(new GetClient(id));
         }
 
         [HttpGet]

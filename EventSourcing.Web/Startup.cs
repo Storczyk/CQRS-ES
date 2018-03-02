@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using EventSourcing.Web.Clients.Domain.Clients;
 using EventSourcing.Web.Clients.Domain.Clients.Handlers;
 using EventSourcing.Web.Clients.Storage;
 using EventSourcing.Web.Clients.Views.Clients;
@@ -81,8 +82,8 @@ namespace EventSourcing.Web
 
             services.AddScoped<IRequestHandler<CreateClient>, ClientsCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateClient>, ClientsCommandHandler>();
-            services.AddScoped<IRequestHandler<GetClients, List<ClientListItem>>, ClientsQueryHandler>();
-            services.AddScoped<IRequestHandler<GetClient, ClientItem>, ClientsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetClients, List<Client>>, ClientsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetClient, Client>, ClientsQueryHandler>();
             services.AddScoped<ISession, Session>();
             services.AddSingleton<IEventStore, InMemoryEventStore>();
             services.AddScoped<IRepository, Repository>();

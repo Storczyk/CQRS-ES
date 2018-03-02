@@ -5,14 +5,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using EventSourcing.Web.Clients.Storage;
 using EventSourcing.Web.Domain.Events;
+using StackExchange.Redis;
 
 namespace EventSourcing.Web.Storage
 {
-    public class Repository : IRepository
+    public class Repository : ClientsDbContext, IRepository
     {
         private readonly IEventStore _eventStore;
 
-        public Repository(IEventStore eventStore)
+        public Repository(IConnectionMultiplexer redis, IEventStore eventStore) : base(redis)
         {
             _eventStore = eventStore;
         }
@@ -35,6 +36,7 @@ namespace EventSourcing.Web.Storage
             var events = await _eventStore.Get(aggregateId, -1, cancellationToken);
             if (!events.Any())
             {
+                var x = base.GetEvents(aggregateId);
                 //not found
             }
 

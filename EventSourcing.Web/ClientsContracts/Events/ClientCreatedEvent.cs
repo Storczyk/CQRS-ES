@@ -8,11 +8,12 @@ namespace EventSourcing.Web.ClientsContracts.Events
         public Guid ClientId { get; }
         public ClientInfo Data { get; }
 
-        public ClientCreatedEvent(Guid id, ClientInfo data, Guid clientId)
+        public ClientCreatedEvent(Guid agregateId, ClientInfo data)
         {
-            Id = id;
+            ClientId = Guid.NewGuid();
+            Id = agregateId;
             Data = data;
-            ClientId = clientId;
+            EventType = EventType.AccountCreated;
         }
     }
 }

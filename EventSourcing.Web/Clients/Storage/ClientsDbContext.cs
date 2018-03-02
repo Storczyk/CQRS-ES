@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using EventSourcing.Web.Clients.Domain.Clients;
-using EventSourcing.Web.ClientsContracts.Queries;
+using EventSourcing.Web.ClientsContracts.Events;
+using EventSourcing.Web.Domain.Events;
+using EventSourcing.Web.TransactionsContracts.Accounts.Events;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
 using ReflectionMagic;
 using StackExchange.Redis;
+using StackExchange.Redis.KeyspaceIsolation;
 
 namespace EventSourcing.Web.Clients.Storage
 {
@@ -15,92 +15,104 @@ namespace EventSourcing.Web.Clients.Storage
     {
         private readonly IConnectionMultiplexer _redisConnection;
 
-        private readonly string _namespace;
-
-        public ClientsDbContext(IConnectionMultiplexer redis, string nameSpace)
+        public ClientsDbContext(IConnectionMultiplexer redis)
         {
             _redisConnection = redis;
-            _namespace = nameSpace;
         }
 
-        public T Get<T>(Guid id)
+        public List<IEvent> GetEvents(Guid id)
         {
-            return Get<T>(id.ToString());
+            return GetEvents(id.ToString());
         }
 
-        public T Get<T>(string keySuffix)
+        public List<IEvent> GetEvents(string keySuffix)
         {
-            var key = MakeKey(keySuffix);
+            var key = MakeKey(Guid.NewGuid().ToString(), Guid.Empty);
             var database = _redisConnection.GetDatabase();
-            var serializedObject = database.StringGet(key);
-            if (serializedObject.IsNullOrEmpty) throw new ArgumentNullException();
-            return JsonConvert.DeserializeObject<T>(serializedObject.ToString());
+            var endpoint = _redisConnection.GetEndPoints().First();
+            var keys = _redisConnection.GetServer(endpoint).Keys(pattern: "*" + key + "*");
+            var events = new List<IEvent>();
+            foreach (var redisKey in keys)
+            {
+                var obj = database.StringGet(key);
+                if (obj.IsNullOrEmpty) throw new ArgumentNullException();
+                var json = JsonConvert.DeserializeObject<IEvent>(obj.ToString());
+                switch (json.EventType)
+                {
+                    case EventType.ClientCreated:
+                        events.Add(JsonConvert.DeserializeObject<ClientCreatedEvent>(obj.ToString()));
+                        break;
+                    case EventType.ClientUpdated:
+                        events.Add(JsonConvert.DeserializeObject<ClientUpdatedEvent>(obj.ToString()));
+                        break;
+                    case EventType.AccountCreated:
+                        events.Add(JsonConvert.DeserializeObject<NewAccountCreatedEvent>(obj.ToString()));
+                        break;
+                }
+            }
+            
+
+            return events;
         }
 
         public List<T> GetAll<T>()
         {
             var database = _redisConnection.GetDatabase();
             var endpoint = _redisConnection.GetEndPoints().First();
-            var keys = _redisConnection.GetServer(endpoint).Keys(pattern: _namespace+"*");
+            var keys = _redisConnection.GetServer(endpoint).Keys(pattern: "*");
 
-            return keys.Select(redisKey => database.StringGet(redisKey).ToString().Replace("[", "").Replace("]", ""))
-                .Select(JsonConvert.DeserializeObject<T>).Where(x => !string.IsNullOrEmpty(x.ToString())).ToList();
+            foreach (var redisKey in keys)
+            {
+                var x = database.StringGet(redisKey);
+            }
+            return new List<T>();
         }
 
-        public List<T> GetMultiple<T>(List<Guid> ids)
+        public List<T> Load<T>() where T : class
         {
             var database = _redisConnection.GetDatabase();
-            List<RedisKey> keys = new List<RedisKey>();
-            foreach (var id in ids)
+            var endpoint = _redisConnection.GetEndPoints().First();
+            var keys = _redisConnection.GetServer(endpoint).Keys(pattern: "*");
+            var list = new List<T>();
+            foreach (var redisKey in keys)
             {
-                keys.Add(MakeKey(id));
+                var obj = database.StringGet(redisKey);
+                var deserializedObject = JsonConvert.DeserializeObject<T>(obj);
+                if (deserializedObject != null)
+                {
+                    list.Add(deserializedObject);
+                }
             }
-            var serializedItems = database.StringGet(keys.ToArray(), CommandFlags.None);
-            List<T> items = new List<T>();
-            foreach (var item in serializedItems)
-            {
-                items.Add(JsonConvert.DeserializeObject<T>(item.ToString()));
-            }
-            return items;
+
+            return list;
         }
 
-        public bool Exists(Guid id)
+        public void Save<T>(T entity)
         {
-            return Exists(id.ToString());
-        }
-
-        public bool Exists(string keySuffix)
-        {
-            var key = MakeKey(keySuffix);
             var database = _redisConnection.GetDatabase();
-            var serializedObject = database.StringGet(key);
-            return !serializedObject.IsNullOrEmpty;
+            database.StringSet(entity.AsDynamic().AggregateId.ToString(), JsonConvert.SerializeObject(entity));
         }
 
-        public void Save(Guid id, object entity)
+        public void Save(Guid aggregateId, IEvent @event)
         {
-            Save(id.ToString(), entity);
+            Save(aggregateId.ToString(), @event);
         }
 
-        public void Save(string keySuffix, object entity)
+        public void Save(string aggregateId, IEvent @event)
         {
-            var key = MakeKey(keySuffix);
+            var key = MakeKey(aggregateId, Guid.NewGuid());
             var database = _redisConnection.GetDatabase();
-            database.StringSet(MakeKey(key), JsonConvert.SerializeObject(entity));
+            database.StringSet(key, JsonConvert.SerializeObject(@event));
         }
 
-        private string MakeKey(Guid id)
+        private string MakeKey(string aggregateId, Guid id)
         {
-            return MakeKey(id.ToString());
-        }
-
-        private string MakeKey(string keySuffix)
-        {
-            if (!keySuffix.StartsWith(_namespace + ":"))
+            if (id == Guid.Empty)
+                return aggregateId;
+            else
             {
-                return _namespace + ":" + keySuffix;
+                return aggregateId + ":" + id;
             }
-            else return keySuffix; //Key is already suffixed with namespace
         }
     }
 }

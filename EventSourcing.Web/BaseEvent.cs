@@ -8,5 +8,6 @@ namespace EventSourcing.Web
         public Guid Id { get; set; }
         public DateTime TimeStamp { get; set; }
         public int Version { get; set; }
+        public EventType EventType { get; set; }
     }
 }

@@ -26,8 +26,8 @@ namespace EventSourcing.Web.Clients.Domain.Clients.Handlers
 
         public async Task Handle(CreateClient command, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var id = Guid.NewGuid();
-            var client = new Client(id, command.Data.Name, command.Data.Email);
+            var aggregateId = Guid.NewGuid();
+            var client = new Client(aggregateId, command.Data.Name, command.Data.Email);
             await _session.Add(client, cancellationToken);
             var eventList = await _session.Commit(cancellationToken);
             foreach (var @event in eventList)

@@ -13,15 +13,20 @@ namespace EventSourcing.Web.Clients.Domain.Clients
         public string Email { get; protected set; }
         public List<Guid> Accounts { get; protected set; }
 
-        public Client(Guid id, string name, string email)
+        public Client()
         {
-            AggregateId = id;
-            ApplyChange(new ClientCreatedEvent(id, new ClientInfo(name, email), Guid.NewGuid()));
+
+        }
+
+        public Client(Guid aggregateId, string name, string email)
+        {
+            AggregateId = aggregateId;
+            ApplyChange(new ClientCreatedEvent(aggregateId, new ClientInfo(name, email)));
         }
 
         public void Update(ClientInfo clientInfo)
         {
-            ApplyChange(new ClientUpdatedEvent(AggregateId, clientInfo));
+            ApplyChange(new ClientUpdatedEvent(AggregateId, ClientId, clientInfo));
         }
 
         public void AddAccount(Guid id)
@@ -32,6 +37,7 @@ namespace EventSourcing.Web.Clients.Domain.Clients
         private void Apply(ClientCreatedEvent @event)
         {
             ClientId = @event.ClientId;
+            AggregateId = @event.Id;
             Name = @event.Data.Name;
             Email = @event.Data.Email;
             Accounts = new List<Guid>();
