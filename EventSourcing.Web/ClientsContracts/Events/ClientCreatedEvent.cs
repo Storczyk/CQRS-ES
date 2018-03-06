@@ -13,7 +13,7 @@ namespace EventSourcing.Web.ClientsContracts.Events
             ClientId = Guid.NewGuid();
             Id = agregateId;
             Data = data;
-            EventType = EventType.AccountCreated;
+            EventType = EventType.ClientCreated;
         }
     }
 }

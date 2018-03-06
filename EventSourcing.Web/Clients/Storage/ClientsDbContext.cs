@@ -4,10 +4,10 @@ using System.Linq;
 using EventSourcing.Web.ClientsContracts.Events;
 using EventSourcing.Web.Domain.Events;
 using EventSourcing.Web.TransactionsContracts.Accounts.Events;
+using EventSourcing.Web.TransactionsContracts.Transactions.Events;
 using Newtonsoft.Json;
 using ReflectionMagic;
 using StackExchange.Redis;
-using StackExchange.Redis.KeyspaceIsolation;
 
 namespace EventSourcing.Web.Clients.Storage
 {
@@ -22,21 +22,15 @@ namespace EventSourcing.Web.Clients.Storage
 
         public List<IEvent> GetEvents(Guid id)
         {
-            return GetEvents(id.ToString());
-        }
-
-        public List<IEvent> GetEvents(string keySuffix)
-        {
-            var key = MakeKey(Guid.NewGuid().ToString(), Guid.Empty);
             var database = _redisConnection.GetDatabase();
             var endpoint = _redisConnection.GetEndPoints().First();
-            var keys = _redisConnection.GetServer(endpoint).Keys(pattern: "*" + key + "*");
+            var keys = _redisConnection.GetServer(endpoint).Keys(pattern: "*" + id + "*");
             var events = new List<IEvent>();
             foreach (var redisKey in keys)
             {
-                var obj = database.StringGet(key);
+                var obj = database.StringGet(redisKey);
                 if (obj.IsNullOrEmpty) throw new ArgumentNullException();
-                var json = JsonConvert.DeserializeObject<IEvent>(obj.ToString());
+                var json = JsonConvert.DeserializeObject<BaseEvent>(obj.ToString());
                 switch (json.EventType)
                 {
                     case EventType.ClientCreated:
@@ -48,9 +42,14 @@ namespace EventSourcing.Web.Clients.Storage
                     case EventType.AccountCreated:
                         events.Add(JsonConvert.DeserializeObject<NewAccountCreatedEvent>(obj.ToString()));
                         break;
+                    case EventType.TransferIncome:
+                        events.Add(JsonConvert.DeserializeObject<NewInTransactionRecorded>(obj.ToString()));
+                        break;
+                    case EventType.TransferOutcome:
+                        events.Add(JsonConvert.DeserializeObject<NewOutTransactionRecorded>(obj.ToString()));
+                        break;
                 }
             }
-            
 
             return events;
         }
@@ -68,11 +67,18 @@ namespace EventSourcing.Web.Clients.Storage
             return new List<T>();
         }
 
-        public List<T> Load<T>() where T : class
+        public List<T> Load<T>(string id = null) where T : class
         {
             var database = _redisConnection.GetDatabase();
             var endpoint = _redisConnection.GetEndPoints().First();
-            var keys = _redisConnection.GetServer(endpoint).Keys(pattern: "*");
+            string pattern = string.Empty;
+            if (!string.IsNullOrEmpty(id))
+            {
+                pattern = "*" + id + "*";
+            }
+            else pattern = "*";
+
+            var keys = _redisConnection.GetServer(endpoint).Keys(pattern: pattern);
             var list = new List<T>();
             foreach (var redisKey in keys)
             {

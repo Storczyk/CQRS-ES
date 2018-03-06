@@ -26,8 +26,9 @@ namespace EventSourcing.Web.Storage
             {
                 //different versio found
             }
-
+            
             var changes = aggregate.FlushUncommitedChanges();
+
             return await _eventStore.Save(changes, cancellationToken);
         }
 
@@ -36,7 +37,7 @@ namespace EventSourcing.Web.Storage
             var events = await _eventStore.Get(aggregateId, -1, cancellationToken);
             if (!events.Any())
             {
-                var x = base.GetEvents(aggregateId);
+                events = base.GetEvents(aggregateId);
                 //not found
             }
 

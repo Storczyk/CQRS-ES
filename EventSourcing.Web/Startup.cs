@@ -1,23 +1,10 @@
-﻿using System.Collections.Generic;
-using EventSourcing.Web.Clients.Domain.Clients;
-using EventSourcing.Web.Clients.Domain.Clients.Handlers;
+﻿using System.Reflection;
 using EventSourcing.Web.Clients.Storage;
-using EventSourcing.Web.Clients.Views.Clients;
-using EventSourcing.Web.ClientsContracts.Commands;
-using EventSourcing.Web.ClientsContracts.Events;
-using EventSourcing.Web.ClientsContracts.Queries;
 using EventSourcing.Web.Domain.Commands;
 using EventSourcing.Web.Domain.Events;
 using EventSourcing.Web.Domain.Queries;
 using EventSourcing.Web.Storage;
 using EventSourcing.Web.Transactions.Domain.Accounts;
-using EventSourcing.Web.Transactions.Domain.Accounts.Handlers;
-using EventSourcing.Web.Transactions.Domain.Clients.Handlers;
-using EventSourcing.Web.Transactions.Views.Accounts.Handlers;
-using EventSourcing.Web.TransactionsContracts.Accounts.Commands;
-using EventSourcing.Web.TransactionsContracts.Accounts.Queries;
-using EventSourcing.Web.TransactionsContracts.Accounts.ValueObjects;
-using EventSourcing.Web.TransactionsContracts.Transactions.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -49,7 +36,6 @@ namespace EventSourcing.Web
             services.AddMvc();
 
             services.AddTransient<IAccountNumberGenerator, RandomAccountNumberGenerator>();
-
             ConfigureMediator(services);
 
             ConfigureCQRS(services);
@@ -72,8 +58,7 @@ namespace EventSourcing.Web
             services.AddScoped<ICommandBus, CommandBus>();
             services.AddScoped<IQueryBus, QueryBus>();
             services.AddScoped<IEventBus, EventBus>();
-
-            services.AddScoped<IRequestHandler<CreateNewAccount>, CreateNewAccountHandler>();
+           /* services.AddScoped<IRequestHandler<CreateNewAccount>, CreateNewAccountHandler>();
             services.AddScoped<IRequestHandler<MakeTransfer>, ProcessInTransactionHandler>();
             services.AddScoped<IRequestHandler<GetAccounts, IEnumerable<AccountSummary>>, GetAccountsHandler>();
             services.AddScoped<IRequestHandler<GetAccount, AccountSummary>, GetAccountHandler>();
@@ -83,7 +68,7 @@ namespace EventSourcing.Web
             services.AddScoped<IRequestHandler<CreateClient>, ClientsCommandHandler>();
             services.AddScoped<IRequestHandler<UpdateClient>, ClientsCommandHandler>();
             services.AddScoped<IRequestHandler<GetClients, List<Client>>, ClientsQueryHandler>();
-            services.AddScoped<IRequestHandler<GetClient, Client>, ClientsQueryHandler>();
+            services.AddScoped<IRequestHandler<GetClient, Client>, ClientsQueryHandler>();*/
             services.AddScoped<ISession, Session>();
             services.AddSingleton<IEventStore, InMemoryEventStore>();
             services.AddScoped<IRepository, Repository>();
@@ -92,7 +77,7 @@ namespace EventSourcing.Web
         private static void ConfigureMediator(IServiceCollection services)
         {
             //services.AddScoped<IMediator, Mediator>();
-            services.AddMediatR();
+            services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
             services.AddTransient<SingleInstanceFactory>(sp => t => sp.GetService(t));
             services.AddTransient<MultiInstanceFactory>(sp => t => sp.GetServices(t));
         }

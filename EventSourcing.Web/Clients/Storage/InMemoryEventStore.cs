@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventSourcing.Web.Domain.Events;
@@ -26,7 +27,7 @@ namespace EventSourcing.Web.Clients.Storage
                 list.Add(@event);
                 d.AddRange(list);
             }
-            return d;
+            return events.ToList();
         }
 
         public async Task<IEnumerable<IEvent>> Get(Guid aggregateId, int fromVersion, CancellationToken cancellationToken = default(CancellationToken))

@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using EventSourcing.Web.Clients.Domain.Clients;
 using EventSourcing.Web.ClientsContracts.Commands;
-using EventSourcing.Web.ClientsContracts.Events;
 using EventSourcing.Web.ClientsContracts.Queries;
 using EventSourcing.Web.ClientsContracts.ValueObjects;
 using EventSourcing.Web.Domain.Commands;
-using EventSourcing.Web.Domain.Events;
 using EventSourcing.Web.Domain.Queries;
+using EventSourcing.Web.Transactions.Domain.Accounts;
 using EventSourcing.Web.TransactionsContracts.Accounts.Queries;
-using EventSourcing.Web.TransactionsContracts.Accounts.ValueObjects;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -46,9 +44,9 @@ namespace EventSourcing.Web.Controllers
 
         [HttpGet]
         [Route("{id}/accounts")]
-        public Task<IEnumerable<AccountSummary>> GetAccounts(Guid id)
+        public Task<IEnumerable<Account>> GetAccounts(Guid id)
         {
-            return _queryBus.Send<GetAccounts, IEnumerable<AccountSummary>>(new GetAccounts(id));
+            return _queryBus.Send<GetAccounts, IEnumerable<Account>>(new GetAccounts(id));
         }
 
         [HttpPost]

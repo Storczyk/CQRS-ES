@@ -1,10 +1,10 @@
 ﻿using System;
 using EventSourcing.Web.Domain.Queries;
-using EventSourcing.Web.TransactionsContracts.Accounts.ValueObjects;
+using EventSourcing.Web.Transactions.Domain.Accounts;
 
 namespace EventSourcing.Web.TransactionsContracts.Accounts.Queries
 {
-    public class GetAccount : IQuery<AccountSummary>
+    public class GetAccount : IQuery<Account>
     {
         public Guid AccountId { get; private set; }
 

@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using EventSourcing.Web.Domain.Commands;
 using EventSourcing.Web.Domain.Queries;
+using EventSourcing.Web.Transactions.Domain.Accounts;
 using EventSourcing.Web.TransactionsContracts.Accounts.Commands;
 using EventSourcing.Web.TransactionsContracts.Accounts.Queries;
-using EventSourcing.Web.TransactionsContracts.Accounts.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventSourcing.Web.Controllers
@@ -23,9 +23,9 @@ namespace EventSourcing.Web.Controllers
 
         // GET api/values
         [HttpGet("{accountId}")]
-        public Task<AccountSummary> Get(Guid accountId)
+        public Task<Account> Get(Guid accountId)
         {
-            return _queryBus.Send<GetAccount, AccountSummary>(new GetAccount(accountId));
+            return _queryBus.Send<GetAccount, Account>(new GetAccount(accountId));
         }
 
         // POST api/values

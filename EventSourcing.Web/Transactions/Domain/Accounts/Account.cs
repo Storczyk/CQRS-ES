@@ -6,7 +6,7 @@ using EventSourcing.Web.TransactionsContracts.Transactions.Events;
 
 namespace EventSourcing.Web.Transactions.Domain.Accounts
 {
-    public class Account : EventSource
+    public class Account : AggregateRoot
     {
         public Guid ClientId { get; private set; }
         public decimal Balance { get; private set; }
@@ -14,37 +14,25 @@ namespace EventSourcing.Web.Transactions.Domain.Accounts
 
         public Account() { }
 
-        public Account(Guid clientId, IAccountNumberGenerator numberGenerator)
+        public Account(Guid aggregateId, IAccountNumberGenerator numberGenerator)
         {
-            /*var @event = new NewAccountCreatedEvent
-            {
-                AccountId = Guid.NewGuid(),
-                ClientId = clientId,
-                Number = numberGenerator.Generate(),
-            };
-            */
-            //Apply(@event);
-            //Append(@event);
+            ApplyChange(new NewAccountCreatedEvent(aggregateId, numberGenerator.Generate()));
         }
 
         public void RecordInTransaction(Guid fromId, decimal amount)
         {
-            var @event = new NewInTransactionRecorded(fromId, Id, new InTransaction(amount, DateTime.Now));
-            Apply(@event);
-            Append(@event);
+            ApplyChange(new NewInTransactionRecorded(fromId, AggregateId, new InTransaction(amount, DateTime.Now)));
         }
 
         public void RecordOutTransaction(Guid toId, decimal amount)
         {
-            var @event = new NewOutTransactionRecorded(Id, toId,new OutTransaction(amount,DateTime.Now));
-            Apply(@event);
-            Append(@event);
+            ApplyChange(new NewOutTransactionRecorded(AggregateId, toId, new OutTransaction(amount, DateTime.Now)));
         }
 
         public void Apply(NewAccountCreatedEvent @event)
         {
-            Id = @event.AccountId;
             ClientId = @event.ClientId;
+            AggregateId = @event.Id;
             Number = @event.Number;
         }
 

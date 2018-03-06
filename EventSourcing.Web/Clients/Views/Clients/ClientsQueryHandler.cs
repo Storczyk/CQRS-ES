@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.Internal;
 using EventSourcing.Web.Storage;
 using StackExchange.Redis;
 using InMemoryDatabase = EventSourcing.Web.Storage.InMemoryDatabase;
+using EventSourcing.Web.Domain.Events;
 
 namespace EventSourcing.Web.Clients.Views.Clients
 {
@@ -29,7 +30,9 @@ namespace EventSourcing.Web.Clients.Views.Clients
             foreach (var clientCreatedEvent in events)
             {
                 Client client = new Client();
-                client.ApplyChange(clientCreatedEvent);
+                var listT = new List<IEvent>() { clientCreatedEvent };
+                client.LoadFromHistory(listT);
+
                 var clientEvents = GetEvents(client.AggregateId);
                 if (clientEvents.Any())
                 {
@@ -43,8 +46,11 @@ namespace EventSourcing.Web.Clients.Views.Clients
 
         public Task<Client> Handle(GetClient query, CancellationToken cancellationToken = default(CancellationToken))
         {
-
-            return Task.FromResult(InMemoryDatabase.Details.FirstOrDefault(x => x.Key == query.ClientId).Value);
+            var events = Load<ClientCreatedEvent>(query.ClientId.ToString()).Single();
+            var client = new Client();
+            var listT = new List<IEvent>() { events };
+            client.LoadFromHistory(listT);
+            return Task.FromResult(client);
         }
 
 
