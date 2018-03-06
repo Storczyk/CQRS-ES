@@ -13,6 +13,7 @@ namespace EventSourcing.Web.ClientsContracts.Events
             Id = id;
             ClientId = clientId;
             Data = data;
+            EventType = EventType.ClientUpdated;
         }
     }
 }

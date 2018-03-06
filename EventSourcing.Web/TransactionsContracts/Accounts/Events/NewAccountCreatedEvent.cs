@@ -12,6 +12,7 @@ namespace EventSourcing.Web.TransactionsContracts.Accounts.Events
         {
             Id = aggregateId;
             AccountId = Guid.NewGuid();
+            EventType = EventType.AccountCreated;
         }
     }
 }

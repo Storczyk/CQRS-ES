@@ -14,6 +14,7 @@ namespace EventSourcing.Web.TransactionsContracts.Transactions.Events
             FromAccountId = fromAccountId;
             ToAccountId = toAccountId;
             Inflow = inflow;
+            EventType = EventType.TransferIncome;
         }
     }
 }

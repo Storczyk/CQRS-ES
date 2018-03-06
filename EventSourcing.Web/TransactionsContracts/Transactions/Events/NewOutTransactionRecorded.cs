@@ -13,6 +13,7 @@ namespace EventSourcing.Web.TransactionsContracts.Transactions.Events
             FromAccountId = fromAccountId;
             ToAccountId = toAccountId;
             Outflow = outflow;
+            EventType = EventType.TransferOutcome;
         }
     }
 }
