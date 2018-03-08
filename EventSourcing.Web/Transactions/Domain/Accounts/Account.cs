@@ -14,9 +14,9 @@ namespace EventSourcing.Web.Transactions.Domain.Accounts
 
         public Account() { }
 
-        public Account(Guid aggregateId, IAccountNumberGenerator numberGenerator)
+        public Account(Guid aggregateId, IAccountNumberGenerator numberGenerator, Guid clientId)
         {
-            ApplyChange(new NewAccountCreatedEvent(aggregateId, numberGenerator.Generate()));
+            ApplyChange(new NewAccountCreatedEvent(aggregateId, numberGenerator.Generate(), clientId));
         }
 
         public void RecordInTransaction(Guid fromId, decimal amount)

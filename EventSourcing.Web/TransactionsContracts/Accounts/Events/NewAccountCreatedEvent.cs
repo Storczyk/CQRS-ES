@@ -8,9 +8,11 @@ namespace EventSourcing.Web.TransactionsContracts.Accounts.Events
         public Guid ClientId { get; set; }
         public string Number { get; set; }
 
-        public NewAccountCreatedEvent(Guid aggregateId, string accountNumber)
+        public NewAccountCreatedEvent(Guid aggregateId, string accountNumber, Guid clientId)
         {
             Id = aggregateId;
+            Number = accountNumber;
+            ClientId = clientId;
             AccountId = Guid.NewGuid();
             EventType = EventType.AccountCreated;
         }

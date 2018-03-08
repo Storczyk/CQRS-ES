@@ -5,6 +5,6 @@ namespace EventSourcing.Web.TransactionsContracts.Accounts.Commands
 {
     public class CreateNewAccount : ICommand
     {
-        public Guid ClientId { get; set; }
+        public Guid AggregateId { get; set; }
     }
 }

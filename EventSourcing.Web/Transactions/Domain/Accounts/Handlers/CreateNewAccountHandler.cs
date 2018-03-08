@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using EventSourcing.Web.Clients.Domain.Clients;
 using EventSourcing.Web.Domain.Commands;
 using EventSourcing.Web.Domain.Events;
 using EventSourcing.Web.Storage;
@@ -24,7 +25,8 @@ namespace EventSourcing.Web.Transactions.Domain.Accounts.Handlers
 
         public async Task Handle(CreateNewAccount message, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var account = new Account(message.ClientId, _accountNumberGenerator);
+            var client = await _session.Get<Client>(message.AggregateId, cancellationToken: cancellationToken);
+            var account = new Account(message.AggregateId, _accountNumberGenerator, client.ClientId);
             await _session.Add(account, cancellationToken);
             var eventList = await _session.Commit(cancellationToken);
             foreach (var @event in eventList)
