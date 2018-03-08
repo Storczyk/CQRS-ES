@@ -50,7 +50,6 @@ namespace EventSourcing.Web.Storage
                 //different aggregate
             }
 
-            await Add(aggregate, cancellationToken);
             return aggregate;
         }
 

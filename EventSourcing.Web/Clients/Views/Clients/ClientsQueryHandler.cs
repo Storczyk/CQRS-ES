@@ -46,10 +46,9 @@ namespace EventSourcing.Web.Clients.Views.Clients
 
         public Task<Client> Handle(GetClient query, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var events = Load<ClientCreatedEvent>(query.ClientId.ToString()).Single();
+            var events = Load<IEvent>(query.ClientId.ToString());
             var client = new Client();
-            var listT = new List<IEvent>() { events };
-            client.LoadFromHistory(listT);
+            client.LoadFromHistory(events);
             return Task.FromResult(client);
         }
 
