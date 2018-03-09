@@ -8,6 +8,8 @@ namespace EventSourcing.Web.TransactionsContracts.Accounts.Events
         public Guid ClientId { get; set; }
         public string Number { get; set; }
 
+        public NewAccountCreatedEvent() { }
+
         public NewAccountCreatedEvent(Guid aggregateId, string accountNumber, Guid clientId)
         {
             Id = aggregateId;

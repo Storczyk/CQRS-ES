@@ -26,27 +26,32 @@ namespace EventSourcing.Web.Clients.Storage
             var endpoint = _redisConnection.GetEndPoints().First();
             var keys = _redisConnection.GetServer(endpoint).Keys(pattern: "*" + id + "*");
             var events = new List<IEvent>();
+            var setting = new JsonSerializerSettings
+            {
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects
+            };
             foreach (var redisKey in keys)
             {
                 var obj = database.StringGet(redisKey);
                 if (obj.IsNullOrEmpty) throw new ArgumentNullException();
                 var json = JsonConvert.DeserializeObject<BaseEvent>(obj.ToString());
+
                 switch (json.EventType)
                 {
                     case EventType.ClientCreated:
-                        events.Add(JsonConvert.DeserializeObject<ClientCreatedEvent>(obj.ToString()));
+                        events.Add(JsonConvert.DeserializeObject<ClientCreatedEvent>(obj, setting));
                         break;
                     case EventType.ClientUpdated:
-                        events.Add(JsonConvert.DeserializeObject<ClientUpdatedEvent>(obj.ToString()));
+                        events.Add(JsonConvert.DeserializeObject<ClientUpdatedEvent>(obj.ToString(), setting));
                         break;
                     case EventType.AccountCreated:
-                        events.Add(JsonConvert.DeserializeObject<NewAccountCreatedEvent>(obj.ToString()));
+                        events.Add(JsonConvert.DeserializeObject<NewAccountCreatedEvent>(obj.ToString(), setting));
                         break;
                     case EventType.TransferIncome:
-                        events.Add(JsonConvert.DeserializeObject<NewInTransactionRecorded>(obj.ToString()));
+                        events.Add(JsonConvert.DeserializeObject<NewInTransactionRecorded>(obj.ToString(), setting));
                         break;
                     case EventType.TransferOutcome:
-                        events.Add(JsonConvert.DeserializeObject<NewOutTransactionRecorded>(obj.ToString()));
+                        events.Add(JsonConvert.DeserializeObject<NewOutTransactionRecorded>(obj.ToString(), setting));
                         break;
                 }
             }

@@ -5,9 +5,10 @@ namespace EventSourcing.Web.ClientsContracts.Events
 {
     public class ClientCreatedEvent : BaseEvent
     {
-        public Guid ClientId { get; }
-        public ClientInfo Data { get; }
+        public Guid ClientId { get; set; }
+        public ClientInfo Data { get; set; }
 
+        public ClientCreatedEvent() { }
         public ClientCreatedEvent(Guid agregateId, ClientInfo data)
         {
             ClientId = Guid.NewGuid();

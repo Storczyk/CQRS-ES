@@ -8,6 +8,7 @@ namespace EventSourcing.Web.ClientsContracts.Events
         public Guid ClientId { get; }
         public ClientInfo Data { get; }
 
+        public ClientUpdatedEvent() { }
         public ClientUpdatedEvent(Guid id, Guid clientId, ClientInfo data)
         {
             Id = id;

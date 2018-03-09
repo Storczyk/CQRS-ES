@@ -51,7 +51,7 @@ namespace EventSourcing.Web
         {
             lock (_changes)
             {
-                foreach (var e in history.ToArray())
+                foreach (var e in history.ToArray().OrderBy(x => x.Version))
                 {
                     if (e.Version != Version + 1)
                     {

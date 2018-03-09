@@ -26,8 +26,9 @@ namespace EventSourcing.Web.Transactions.Domain.Accounts.Handlers
         public async Task Handle(CreateNewAccount message, CancellationToken cancellationToken = default(CancellationToken))
         {
             var client = await _session.Get<Client>(message.AggregateId, cancellationToken: cancellationToken);
-            var account = new Account(message.AggregateId, _accountNumberGenerator, client.ClientId);
-            await _session.Add(account, cancellationToken);
+            client.AddAccount(_accountNumberGenerator);
+            //var account = new Account(message.AggregateId, _accountNumberGenerator, client.ClientId);
+            await _session.Add(client, cancellationToken);
             var eventList = await _session.Commit(cancellationToken);
             foreach (var @event in eventList)
             {
