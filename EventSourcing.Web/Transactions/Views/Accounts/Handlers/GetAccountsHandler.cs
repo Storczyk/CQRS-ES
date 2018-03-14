@@ -12,7 +12,7 @@ using StackExchange.Redis;
 
 namespace EventSourcing.Web.Transactions.Views.Accounts.Handlers
 {
-    public class GetAccountsHandler : ClientsDbContext, IQueryHandler<GetAccounts, IEnumerable<Account>>
+    public class GetAccountsHandler : ClientsDbContext, IQueryHandler<GetAccount, Account>
     {
         private readonly ISession _session;
         private readonly IEventBus _eventBus;
@@ -23,20 +23,13 @@ namespace EventSourcing.Web.Transactions.Views.Accounts.Handlers
             _session = session;
         }
 
-        public async Task<IEnumerable<Account>> Handle(GetAccounts request, CancellationToken cancellationToken)
+        public async Task<Account> Handle(GetAccount request, CancellationToken cancellationToken)
         {
-            var events = Load<NewAccountCreatedEvent>(request.ClientId.ToString());
-            var accounts = new List<Account>();
-            foreach(var @event in events)
-            {
-                var account = new Account();
-                var listT = new List<IEvent>() { @event };
-                account.LoadFromHistory(listT);
+            var events = GetEvents(request.AccountId);
+            var account = new Account();
+            account.LoadFromHistory(events);
 
-                accounts.Add(account);
-            }
-
-            return accounts;
+            return account;
         }
     }
 }

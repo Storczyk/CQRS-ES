@@ -7,6 +7,7 @@ using EventSourcing.Web.ClientsContracts.Queries;
 using EventSourcing.Web.Domain.Events;
 using EventSourcing.Web.Storage;
 using EventSourcing.Web.TransactionsContracts.Accounts.Events;
+using EventSourcing.Web.TransactionsContracts.Transactions.Events;
 using MediatR;
 using StackExchange.Redis;
 
@@ -15,7 +16,9 @@ namespace EventSourcing.Web.Transactions.Domain.Clients.Handlers
     public class EventHandler : ClientsDbContext,
         INotificationHandler<ClientCreatedEvent>,
         INotificationHandler<ClientUpdatedEvent>,
-        INotificationHandler<NewAccountCreatedEvent>
+        INotificationHandler<NewAccountCreatedEvent>, 
+        INotificationHandler<NewInTransactionRecorded>,
+        INotificationHandler<NewOutTransactionRecorded>
     {
         public EventHandler(IConnectionMultiplexer connection) : base(connection) { }
 
@@ -32,6 +35,18 @@ namespace EventSourcing.Web.Transactions.Domain.Clients.Handlers
         }
 
         public Task Handle(NewAccountCreatedEvent @event, CancellationToken cancellationToken)
+        {
+            Save(@event.Id, @event);
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(NewOutTransactionRecorded @event, CancellationToken cancellationToken)
+        {
+            Save(@event.Id, @event);
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(NewInTransactionRecorded @event, CancellationToken cancellationToken)
         {
             Save(@event.Id, @event);
             return Task.CompletedTask;

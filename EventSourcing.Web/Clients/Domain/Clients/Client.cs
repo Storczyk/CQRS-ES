@@ -47,7 +47,6 @@ namespace EventSourcing.Web.Clients.Domain.Clients
         private void Apply(NewAccountCreatedEvent @event)
         {
             var account = new Account();
-
             account.Apply(@event);
             Accounts.Add(account);
         }

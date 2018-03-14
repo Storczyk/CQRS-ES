@@ -34,7 +34,6 @@ namespace EventSourcing.Web.Transactions.Domain.Accounts
             ClientId = @event.ClientId;
             AggregateId = @event.Id;
             Number = @event.Number;
-            Version = @event.Version;
         }
 
         public void Apply(NewInTransactionRecorded @event)

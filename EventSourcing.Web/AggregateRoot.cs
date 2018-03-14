@@ -53,13 +53,13 @@ namespace EventSourcing.Web
             {
                 foreach (var e in history.ToArray().OrderBy(x => x.Version))
                 {
-                    if (e.Version != Version + 1)
+                    try
                     {
-                        throw new AggregateException($"{e.Id}");
+                        ApplyEvent(e);
                     }
-                    ApplyEvent(e);
+                    catch { continue; }
                     AggregateId = e.Id;
-                    Version++;
+                    Version = e.Version;
                 }
             }
         }
@@ -79,7 +79,7 @@ namespace EventSourcing.Web
             {
                 this.AsDynamic().Apply(@event);
             }
-            catch { }
+            catch { throw; }
         }
     }
 }
