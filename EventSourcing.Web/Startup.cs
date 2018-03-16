@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using StackExchange.Redis;
 
 namespace EventSourcing.Web
@@ -80,6 +81,7 @@ namespace EventSourcing.Web
             services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
             services.AddTransient<SingleInstanceFactory>(sp => t => sp.GetService(t));
             services.AddTransient<MultiInstanceFactory>(sp => t => sp.GetServices(t));
+            services.AddSingleton<IHostedService, Service>();
         }
     }
 }

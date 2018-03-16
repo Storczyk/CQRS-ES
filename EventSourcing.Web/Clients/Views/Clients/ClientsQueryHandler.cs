@@ -25,7 +25,7 @@ namespace EventSourcing.Web.Clients.Views.Clients
         public Task<List<Client>> Handle(GetClients query, CancellationToken cancellationToken = default(CancellationToken))
         {
             //var client = GetAll<Client>();
-            var events = Load<ClientCreatedEvent>();
+            var events = Load<ClientCreatedEvent>().Where(d => d.EventType==EventType.ClientCreated);
             var list = new List<Client>();
             foreach (var clientCreatedEvent in events)
             {
