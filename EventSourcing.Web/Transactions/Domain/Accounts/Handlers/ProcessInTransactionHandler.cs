@@ -2,7 +2,6 @@
 using EventSourcing.Web.Clients.Storage;
 using EventSourcing.Web.Domain.Commands;
 using EventSourcing.Web.Domain.Events;
-using EventSourcing.Web.Domain.ValueObjects;
 using EventSourcing.Web.Storage;
 using EventSourcing.Web.TransactionsContracts.Transactions.Commands;
 using MediatR;

@@ -15,13 +15,16 @@ namespace EventSourcing.Web.Controllers
     {
         private readonly ICommandBus _commandBus;
         private readonly IQueryBus _queryBus;
-        private readonly IHostedService hostedService;
+        //private readonly IHostedService hostedService;
+
+        private Task<bool> _executingTask;
+        private CancellationTokenSource _cts;
 
         public TransactionsController(ICommandBus commandBus, IQueryBus queryBus, IHostedService hostedService)
         {
             _commandBus = commandBus;
             _queryBus = queryBus;
-            this.hostedService = hostedService;
+            //this.hostedService = hostedService;
         }
 
         [HttpPost]
@@ -33,13 +36,37 @@ namespace EventSourcing.Web.Controllers
         public IActionResult Action()
         {
             int a = 1 + 1;
-
-            var d = hostedService.StartAsync(new CancellationToken());
-            //var res = await hostedService.ExecuteAsync(new CancellationToken());
-
-
+            ExecuteAsync(new CancellationToken());
+            //var res = await Method(new CancellationToken());
+            
             int b = 2 + a;
             return Ok(a);
+        }
+
+        private Task<bool> ExecuteAsync(CancellationToken cancellationToken)
+        {
+            _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            _executingTask = Method(_cts.Token);
+
+            if (_executingTask.IsCompleted)
+            {
+                return Task.FromResult(_executingTask.Result);
+            }
+            else
+            {
+                return new Task<bool>(() => false, default(CancellationToken), TaskCreationOptions.None);
+            }
+        }
+
+        private async Task<bool> Method(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+                //operations
+                return true;
+            }
+            return false;
         }
     }
 }

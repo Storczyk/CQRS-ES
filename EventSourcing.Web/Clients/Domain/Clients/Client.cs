@@ -7,16 +7,16 @@ using EventSourcing.Web.TransactionsContracts.Accounts.Events;
 
 namespace EventSourcing.Web.Clients.Domain.Clients
 {
-    public class Client : AggregateRoot
+    public class Client : AggregateRoot, ISnapshotable
     {
         public Guid ClientId { get; protected set; }
         public string Name { get; protected set; }
         public string Email { get; protected set; }
-        public List<Account> Accounts { get; protected set; }
+        public Account Account { get; protected set; }
 
         public Client()
         {
-            Accounts = new List<Account>();
+            Account = new Account();
         }
 
         public Client(Guid aggregateId, string name, string email)
@@ -36,7 +36,7 @@ namespace EventSourcing.Web.Clients.Domain.Clients
             AggregateId = @event.Id;
             Name = @event.Data.Name;
             Email = @event.Data.Email;
-            Accounts = new List<Account>();
+            Account = new Account();
         }
 
         public void AddAccount(IAccountNumberGenerator accountNumberGenerator)
@@ -48,13 +48,29 @@ namespace EventSourcing.Web.Clients.Domain.Clients
         {
             var account = new Account();
             account.Apply(@event);
-            Accounts.Add(account);
+            Account = account;
         }
 
         private void Apply(ClientUpdatedEvent @event)
         {
             Name = @event.Data.Name;
             Email = @event.Data.Email;
+        }
+
+        public Snapshot TakeSnapshot()
+        {
+            return new ClientSnapshot(Guid.NewGuid(),ClientId, AggregateId, Version,Name, Email, Account);
+        }
+
+        public void ApplySnapshot(Snapshot snapshot)
+        {
+            ClientSnapshot item = (ClientSnapshot)snapshot;
+            AggregateId = item.AggregateId;
+            ClientId = item.ClientId;
+            Version = item.Version;
+            Name = item.Name;
+            Email = item.Email;
+
         }
     }
 }

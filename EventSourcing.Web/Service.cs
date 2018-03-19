@@ -14,7 +14,7 @@ namespace EventSourcing.Web
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                //this Task.Delay is necessary (might be 0.1)
+                
                 await Task.Delay(TimeSpan.FromSeconds(0.05), cancellationToken);
                 //operations
                 return true;

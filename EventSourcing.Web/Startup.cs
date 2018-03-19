@@ -35,7 +35,7 @@ namespace EventSourcing.Web
             services.AddSingleton<IConnectionMultiplexer>(multiplexer);
             services.AddSession();
             services.AddMvc();
-
+            services.AddSingleton<IHostedService, Service>();
             services.AddTransient<IAccountNumberGenerator, RandomAccountNumberGenerator>();
             ConfigureMediator(services);
 
@@ -81,7 +81,7 @@ namespace EventSourcing.Web
             services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
             services.AddTransient<SingleInstanceFactory>(sp => t => sp.GetService(t));
             services.AddTransient<MultiInstanceFactory>(sp => t => sp.GetServices(t));
-            services.AddSingleton<IHostedService, Service>();
+
         }
     }
 }

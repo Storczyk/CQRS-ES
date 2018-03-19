@@ -1,11 +1,7 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using EventSourcing.Web.Clients.Storage;
 using EventSourcing.Web.ClientsContracts.Events;
-using EventSourcing.Web.ClientsContracts.Queries;
-using EventSourcing.Web.Domain.Events;
-using EventSourcing.Web.Storage;
 using EventSourcing.Web.TransactionsContracts.Accounts.Events;
 using EventSourcing.Web.TransactionsContracts.Transactions.Events;
 using MediatR;

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using EventSourcing.Web.Clients.Domain.Clients;
 using EventSourcing.Web.Domain.Commands;
 using EventSourcing.Web.Domain.Events;
 using EventSourcing.Web.Storage;
-using EventSourcing.Web.Transactions.Views.Clients;
 using EventSourcing.Web.TransactionsContracts.Accounts.Commands;
 
 namespace EventSourcing.Web.Transactions.Domain.Accounts.Handlers
