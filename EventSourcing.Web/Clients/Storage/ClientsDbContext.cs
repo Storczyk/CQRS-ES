@@ -101,7 +101,7 @@ namespace EventSourcing.Web.Clients.Storage
         public void Save<T>(T entity)
         {
             var database = _redisConnection.GetDatabase();
-            database.StringSet(entity.AsDynamic().AggregateId.ToString(), JsonConvert.SerializeObject(entity));
+            database.StringSet(entity.AsDynamic().AggregateId.ToString() + ":" + Guid.NewGuid().ToString(), JsonConvert.SerializeObject(entity));
         }
 
         public void Save(Guid aggregateId, IEvent @event)

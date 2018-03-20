@@ -10,5 +10,9 @@ namespace EventSourcing.Web.Storage
     {
         Task<List<IEvent>> Save<T>(T aggregate, int? expectedVersion = null, CancellationToken cancellationToken = default(CancellationToken)) where T : AggregateRoot;
         Task<T> Get<T>(Guid aggregateId, CancellationToken cancellationToken = default(CancellationToken)) where T : AggregateRoot;
+
+        int SnapshotFrequency { get; }
+        T GetSnapshot<T>(Guid aggregateId) where T : ISnapshotable;
+        void SaveSnapshot(Type aggregateType, Snapshot snapshot);
     }
 }

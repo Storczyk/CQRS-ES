@@ -70,7 +70,6 @@ namespace EventSourcing.Web.Clients.Domain.Clients
             Version = item.Version;
             Name = item.Name;
             Email = item.Email;
-
         }
     }
 }

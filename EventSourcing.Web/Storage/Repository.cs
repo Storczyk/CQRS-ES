@@ -14,10 +14,13 @@ namespace EventSourcing.Web.Storage
         private readonly IEventStore _eventStore;
         private readonly ISnapshotStorageProvider snapshotStorageProvider;
 
+        public int SnapshotFrequency { get; }
+
         public Repository(IConnectionMultiplexer redis, IEventStore eventStore, ISnapshotStorageProvider snapshotStorageProvider) : base(redis)
         {
             _eventStore = eventStore;
             this.snapshotStorageProvider = snapshotStorageProvider;
+            SnapshotFrequency = 10;
         }
 
         public async Task<List<IEvent>> Save<T>(T aggregate, int? expectedVersion = null,
@@ -46,6 +49,23 @@ namespace EventSourcing.Web.Storage
             var aggregate = (T)Activator.CreateInstance(typeof(T));
             aggregate.LoadFromHistory(events);
             return aggregate;
+        }
+
+        public Snapshot GetSnapshot(Type aggregateType, Guid aggregateId)
+        {
+            Snapshot snapshot = null;
+            var l = base.Load<Snapshot>(aggregateId.ToString());
+            foreach(var item in l)
+            {
+                var isSnapshotable = typeof(ISnapshotable).IsAssignableFrom(item.GetType());
+                if(isSnapshotable)
+            }
+
+        }
+
+        public void SaveSnapshot(Snapshot snapshot)
+        {
+            base.Save<Snapshot>(snapshot);
         }
     }
 }
