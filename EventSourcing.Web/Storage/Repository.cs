@@ -31,7 +31,7 @@ namespace EventSourcing.Web.Storage
             {
                 //different versio found
             }
-            
+
             var changes = aggregate.FlushUncommitedChanges();
 
             return await _eventStore.Save(changes, cancellationToken);
@@ -51,14 +51,19 @@ namespace EventSourcing.Web.Storage
             return aggregate;
         }
 
-        public Snapshot GetSnapshot(Type aggregateType, Guid aggregateId)
+        public T GetSnapshot<T>(Guid aggregateId) where T:ISnapshotable
         {
-            Snapshot snapshot = null;
+            var p = default(T);
+
             var l = base.Load<Snapshot>(aggregateId.ToString());
-            foreach(var item in l)
+            foreach (var item in l)
             {
                 var isSnapshotable = typeof(ISnapshotable).IsAssignableFrom(item.GetType());
-                if(isSnapshotable)
+                if (isSnapshotable)
+                {
+                    ((ISnapshotable)p).ApplySnapshot(item);
+                    return p;
+                }
             }
 
         }
