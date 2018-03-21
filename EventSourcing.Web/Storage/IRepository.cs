@@ -13,6 +13,6 @@ namespace EventSourcing.Web.Storage
 
         int SnapshotFrequency { get; }
         T GetSnapshot<T>(Guid aggregateId) where T : ISnapshotable;
-        void SaveSnapshot(Type aggregateType, Snapshot snapshot);
+        void SaveSnapshot(Snapshot snapshot);
     }
 }

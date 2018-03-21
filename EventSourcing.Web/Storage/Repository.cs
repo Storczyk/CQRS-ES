@@ -12,14 +12,12 @@ namespace EventSourcing.Web.Storage
     public class Repository : ClientsDbContext, IRepository
     {
         private readonly IEventStore _eventStore;
-        private readonly ISnapshotStorageProvider snapshotStorageProvider;
 
         public int SnapshotFrequency { get; }
 
-        public Repository(IConnectionMultiplexer redis, IEventStore eventStore, ISnapshotStorageProvider snapshotStorageProvider) : base(redis)
+        public Repository(IConnectionMultiplexer redis, IEventStore eventStore) : base(redis)
         {
             _eventStore = eventStore;
-            this.snapshotStorageProvider = snapshotStorageProvider;
             SnapshotFrequency = 10;
         }
 
@@ -65,7 +63,7 @@ namespace EventSourcing.Web.Storage
                     return p;
                 }
             }
-
+            return p;
         }
 
         public void SaveSnapshot(Snapshot snapshot)

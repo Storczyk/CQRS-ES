@@ -11,7 +11,7 @@ using EventSourcing.Web.Domain.Queries;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using EventSourcing.Web.Storage;
 using StackExchange.Redis;
-using InMemoryDatabase = EventSourcing.Web.Storage.InMemoryDatabase;
+
 using EventSourcing.Web.Domain.Events;
 
 namespace EventSourcing.Web.Clients.Views.Clients
