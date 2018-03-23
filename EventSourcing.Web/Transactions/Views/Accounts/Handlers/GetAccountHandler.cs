@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using EventSourcing.Web.Clients.Domain.Clients;
 using EventSourcing.Web.Clients.Storage;
 using EventSourcing.Web.Domain.Events;
 using EventSourcing.Web.Domain.Queries;
@@ -26,10 +27,10 @@ namespace EventSourcing.Web.Transactions.Views.Accounts.Handlers
         public async Task<Account> Handle(GetAccount request, CancellationToken cancellationToken)
         {
             var events = GetEvents(request.AccountId);
-            var account = new Account();
-            account.LoadFromHistory(events);
+            var client = new Client();
+            client.LoadFromHistory(events);
 
-            return account;
+            return client.Account;
         }
     }
 }

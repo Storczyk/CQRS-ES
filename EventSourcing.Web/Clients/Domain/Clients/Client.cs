@@ -4,6 +4,8 @@ using EventSourcing.Web.ClientsContracts.Events;
 using EventSourcing.Web.ClientsContracts.ValueObjects;
 using EventSourcing.Web.Transactions.Domain.Accounts;
 using EventSourcing.Web.TransactionsContracts.Accounts.Events;
+using EventSourcing.Web.TransactionsContracts.Transactions;
+using EventSourcing.Web.TransactionsContracts.Transactions.Events;
 
 namespace EventSourcing.Web.Clients.Domain.Clients
 {
@@ -14,10 +16,7 @@ namespace EventSourcing.Web.Clients.Domain.Clients
         public string Email { get; protected set; }
         public Account Account { get; protected set; }
 
-        public Client()
-        {
-            Account = new Account();
-        }
+        public Client() { }
 
         public Client(Guid aggregateId, string name, string email)
         {
@@ -29,6 +28,21 @@ namespace EventSourcing.Web.Clients.Domain.Clients
         {
             ApplyChange(new ClientUpdatedEvent(AggregateId, ClientId, clientInfo));
         }
+        
+        public void AddAccount(IAccountNumberGenerator accountNumberGenerator)
+        {
+            ApplyChange(new NewAccountCreatedEvent(AggregateId, accountNumberGenerator.Generate(), ClientId));
+        }
+
+        public void RecordInTransaction(Guid fromId, decimal amount)
+        {
+            ApplyChange(new NewInTransactionRecorded(fromId, AggregateId, new InTransaction(amount, DateTime.Now)));
+        }
+
+        public void RecordOutTransaction(Guid toId, decimal amount)
+        {
+            ApplyChange(new NewOutTransactionRecorded(AggregateId, toId, new OutTransaction(amount, DateTime.Now)));
+        }
 
         private void Apply(ClientCreatedEvent @event)
         {
@@ -36,30 +50,33 @@ namespace EventSourcing.Web.Clients.Domain.Clients
             AggregateId = @event.Id;
             Name = @event.Data.Name;
             Email = @event.Data.Email;
-            Account = new Account();
+            Account = null;
         }
 
-        public void AddAccount(IAccountNumberGenerator accountNumberGenerator)
+        public void Apply(NewAccountCreatedEvent @event)
         {
-            ApplyChange(new NewAccountCreatedEvent(AggregateId, accountNumberGenerator.Generate(), ClientId));
+            Account = new Account(@event.ClientId, @event.Number);
         }
 
-        private void Apply(NewAccountCreatedEvent @event)
-        {
-            var account = new Account();
-            account.Apply(@event);
-            Account = account;
-        }
-
-        private void Apply(ClientUpdatedEvent @event)
+        public void Apply(ClientUpdatedEvent @event)
         {
             Name = @event.Data.Name;
             Email = @event.Data.Email;
         }
 
+        public void Apply(NewInTransactionRecorded @event)
+        {
+            Account.Balance += @event.Inflow.Ammount;
+        }
+
+        public void Apply(NewOutTransactionRecorded @event)
+        {
+            Account.Balance -= @event.Outflow.Ammount;
+        }
+
         public Snapshot TakeSnapshot()
         {
-            return new ClientSnapshot(Guid.NewGuid(),ClientId, AggregateId, Version,Name, Email, Account);
+            return new ClientSnapshot(Guid.NewGuid(), ClientId, AggregateId, Version, Name, Email, Account);
         }
 
         public void ApplySnapshot(Snapshot snapshot)

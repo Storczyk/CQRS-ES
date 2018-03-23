@@ -36,13 +36,17 @@ namespace EventSourcing.Web.Controllers
         public IActionResult Action()
         {
             int a = 1 + 1;
-            ExecuteAsync(new CancellationToken());
+            //ExecuteAsync(new CancellationToken());
             //var res = await Method(new CancellationToken());
-            
+            Task.Run(() => Test());
             int b = 2 + a;
             return Ok(a);
         }
-
+        private bool Test()
+        {
+            while (true) ;
+            return true;
+        }
         private Task<bool> ExecuteAsync(CancellationToken cancellationToken)
         {
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);

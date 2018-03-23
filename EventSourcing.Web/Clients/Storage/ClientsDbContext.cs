@@ -24,7 +24,7 @@ namespace EventSourcing.Web.Clients.Storage
         {
             var database = _redisConnection.GetDatabase();
             var endpoint = _redisConnection.GetEndPoints().First();
-            var keys = _redisConnection.GetServer(endpoint).Keys(pattern: "*" + id + "*");
+            var keys = _redisConnection.GetServer(endpoint).Keys(pattern: id + "*");
             var events = new List<IEvent>();
             var setting = new JsonSerializerSettings
             {

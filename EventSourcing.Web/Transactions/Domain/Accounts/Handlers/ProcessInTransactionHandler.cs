@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using EventSourcing.Web.Clients.Domain.Clients;
 using EventSourcing.Web.Clients.Storage;
 using EventSourcing.Web.Domain.Commands;
 using EventSourcing.Web.Domain.Events;
@@ -24,8 +25,8 @@ namespace EventSourcing.Web.Transactions.Domain.Accounts.Handlers
         {
             var accountFromEvents = GetEvents(command.FromAccountId);
             var accountToEvents = GetEvents(command.ToAccountId);
-            var accountFrom = new Account();
-            var accountTo = new Account();
+            var accountFrom = new Client();
+            var accountTo = new Client();
             accountFrom.LoadFromHistory(accountFromEvents);
             accountTo.LoadFromHistory(accountToEvents);
             accountFrom.RecordOutTransaction(command.ToAccountId, command.Amount);

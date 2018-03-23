@@ -12638,7 +12638,6 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "https://api.nuget.org/v3/index.json": {},
         "https://www.myget.org/F/volotea-nuget/auth/e8179969-c3ab-4df7-8646-2554453e395e/api/v2": {}
       },
       "frameworks": {
